@@ -1,0 +1,53 @@
+name: Plugin Check
+
+on:
+  workflow_call:
+    inputs:
+      php-version:
+        description: PHP version
+        type: string
+        default: "8.4"
+      wp-version:
+        description: WordPress version to test against
+        type: string
+        default: latest
+      build-first:
+        description: Run `npm ci && npm run build` before checking
+        type: boolean
+        default: false
+      categories:
+        description: Plugin Check categories (comma-separated)
+        type: string
+        default: plugin_repo
+
+jobs:
+  check:
+    name: Plugin Check (WP ${{ inputs.wp-version }} / PHP ${{ inputs.php-version }})
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ inputs.php-version }}
+          coverage: none
+
+      - name: Set up Node
+        if: ${{ inputs.build-first }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Build
+        if: ${{ inputs.build-first }}
+        run: |
+          npm ci
+          npm run build
+
+      - name: Run Plugin Check
+        uses: WordPress/plugin-check-action@v1
+        with:
+          wp-version: ${{ inputs.wp-version }}
+          categories: ${{ inputs.categories }}

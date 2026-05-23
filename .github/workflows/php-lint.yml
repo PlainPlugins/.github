@@ -1,0 +1,59 @@
+name: PHP lint
+
+on:
+  workflow_call:
+    inputs:
+      php-version:
+        description: PHP version to run against
+        type: string
+        default: "8.4"
+      run-phpcs:
+        description: Run PHPCS (WordPress Coding Standards)
+        type: boolean
+        default: true
+      run-phpstan:
+        description: Run PHPStan
+        type: boolean
+        default: true
+
+jobs:
+  lint:
+    name: PHP ${{ inputs.php-version }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ inputs.php-version }}
+          coverage: none
+          tools: composer:v2
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ inputs.php-version }}-${{ hashFiles('**/composer.json', '**/composer.lock') }}
+          restore-keys: composer-${{ inputs.php-version }}-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: PHPCS
+        if: ${{ inputs.run-phpcs }}
+        run: |
+          if [ -f phpcs.xml.dist ] || [ -f phpcs.xml ]; then
+            vendor/bin/phpcs
+          else
+            echo "::notice::No phpcs config; skipping."
+          fi
+
+      - name: PHPStan
+        if: ${{ inputs.run-phpstan }}
+        run: |
+          if [ -f phpstan.neon.dist ] || [ -f phpstan.neon ]; then
+            vendor/bin/phpstan analyse --no-progress
+          else
+            echo "::notice::No phpstan config; skipping."
+          fi
