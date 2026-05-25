@@ -43,7 +43,11 @@ jobs:
       - name: Build
         if: ${{ inputs.build-first }}
         run: |
-          npm ci
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
           npm run build
 
       - name: Run Plugin Check
