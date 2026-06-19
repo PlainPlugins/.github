@@ -31,6 +31,12 @@ jobs:
   check:
     name: Plugin Check (WP ${{ inputs.wp-version }} / PHP ${{ inputs.php-version }})
     runs-on: ubuntu-latest
+    env:
+      # plugin-check runs the plugin under @wordpress/env, which overwrites any
+      # repo .wp-env.json and otherwise defaults to an older PHP. This env var
+      # is wp-env's documented override, so a plugin that "Requires PHP" a newer
+      # version can still activate and be checked.
+      WP_ENV_PHP_VERSION: ${{ inputs.php-version }}
     steps:
       - uses: actions/checkout@v4
 
