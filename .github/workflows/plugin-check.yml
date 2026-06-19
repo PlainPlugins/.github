@@ -70,7 +70,7 @@ jobs:
       - name: Install runtime dependencies
         run: |
           if [ -f composer.json ]; then
-            composer install --no-dev --no-interaction --no-progress --prefer-dist --optimize-autoloader
+            composer install --no-dev --no-interaction --no-progress --optimize-autoloader
           else
             echo "::notice::No composer.json; skipping dependency install."
           fi

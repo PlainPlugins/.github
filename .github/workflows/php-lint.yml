@@ -55,7 +55,7 @@ jobs:
           fi
 
       - name: Install dependencies
-        run: composer install --no-interaction --no-progress --prefer-dist
+        run: composer install --no-interaction --no-progress
 
       - name: PHPCS
         if: ${{ inputs.run-phpcs }}
