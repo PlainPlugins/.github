@@ -19,6 +19,14 @@ on:
         description: Plugin Check categories (comma-separated)
         type: string
         default: plugin_repo
+      exclude-directories:
+        description: Directories to exclude from checks (comma or newline separated)
+        type: string
+        default: ""
+      exclude-files:
+        description: Files to exclude from checks (comma or newline separated)
+        type: string
+        default: ""
     secrets:
       composer_auth_token:
         description: >-
@@ -86,3 +94,5 @@ jobs:
         with:
           wp-version: ${{ inputs.wp-version }}
           categories: ${{ inputs.categories }}
+          exclude-directories: ${{ inputs.exclude-directories }}
+          exclude-files: ${{ inputs.exclude-files }}
