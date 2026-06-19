@@ -70,7 +70,7 @@ jobs:
         if: ${{ inputs.run-phpstan }}
         run: |
           if [ -f phpstan.neon.dist ] || [ -f phpstan.neon ]; then
-            vendor/bin/phpstan analyse --no-progress
+            vendor/bin/phpstan analyse --no-progress --memory-limit=2G
           else
             echo "::notice::No phpstan config; skipping."
           fi
