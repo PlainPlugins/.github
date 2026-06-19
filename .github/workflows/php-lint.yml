@@ -45,8 +45,14 @@ jobs:
           restore-keys: composer-${{ inputs.php-version }}-
 
       - name: Authenticate Composer for private dependencies
-        if: ${{ secrets.composer_auth_token != '' }}
-        run: composer config --global --auth github-oauth.github.com "${{ secrets.composer_auth_token }}"
+        env:
+          COMPOSER_AUTH_TOKEN: ${{ secrets.composer_auth_token }}
+        run: |
+          if [ -n "$COMPOSER_AUTH_TOKEN" ]; then
+            composer config --global --auth github-oauth.github.com "$COMPOSER_AUTH_TOKEN"
+          else
+            echo "::notice::No composer_auth_token secret set; only public packages will resolve."
+          fi
 
       - name: Install dependencies
         run: composer install --no-interaction --no-progress --prefer-dist
