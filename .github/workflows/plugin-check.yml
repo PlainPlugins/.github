@@ -19,6 +19,13 @@ on:
         description: Plugin Check categories (comma-separated)
         type: string
         default: plugin_repo
+    secrets:
+      composer-auth-token:
+        description: >-
+          Token with read access to private Composer VCS dependencies
+          (a GitHub App installation token or a fine-grained PAT with
+          contents:read). Optional; when unset, only public packages resolve.
+        required: false
 
 jobs:
   check:
@@ -49,6 +56,18 @@ jobs:
             npm install
           fi
           npm run build
+
+      - name: Authenticate Composer for private dependencies
+        if: ${{ secrets.composer-auth-token != '' }}
+        run: composer config --global --auth github-oauth.github.com "${{ secrets.composer-auth-token }}"
+
+      - name: Install runtime dependencies
+        run: |
+          if [ -f composer.json ]; then
+            composer install --no-dev --no-interaction --no-progress --prefer-dist --optimize-autoloader
+          else
+            echo "::notice::No composer.json; skipping dependency install."
+          fi
 
       - name: Run Plugin Check
         uses: WordPress/plugin-check-action@v1

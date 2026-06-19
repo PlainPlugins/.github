@@ -15,6 +15,13 @@ on:
         description: Run PHPStan
         type: boolean
         default: true
+    secrets:
+      composer-auth-token:
+        description: >-
+          Token with read access to private Composer VCS dependencies
+          (a GitHub App installation token or a fine-grained PAT with
+          contents:read). Optional; when unset, only public packages resolve.
+        required: false
 
 jobs:
   lint:
@@ -36,6 +43,10 @@ jobs:
           path: ~/.composer/cache
           key: composer-${{ inputs.php-version }}-${{ hashFiles('**/composer.json', '**/composer.lock') }}
           restore-keys: composer-${{ inputs.php-version }}-
+
+      - name: Authenticate Composer for private dependencies
+        if: ${{ secrets.composer-auth-token != '' }}
+        run: composer config --global --auth github-oauth.github.com "${{ secrets.composer-auth-token }}"
 
       - name: Install dependencies
         run: composer install --no-interaction --no-progress --prefer-dist
