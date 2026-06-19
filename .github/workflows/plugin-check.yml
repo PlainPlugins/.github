@@ -20,7 +20,7 @@ on:
         type: string
         default: plugin_repo
     secrets:
-      composer-auth-token:
+      composer_auth_token:
         description: >-
           Token with read access to private Composer VCS dependencies
           (a GitHub App installation token or a fine-grained PAT with
@@ -58,8 +58,8 @@ jobs:
           npm run build
 
       - name: Authenticate Composer for private dependencies
-        if: ${{ secrets.composer-auth-token != '' }}
-        run: composer config --global --auth github-oauth.github.com "${{ secrets.composer-auth-token }}"
+        if: ${{ secrets.composer_auth_token != '' }}
+        run: composer config --global --auth github-oauth.github.com "${{ secrets.composer_auth_token }}"
 
       - name: Install runtime dependencies
         run: |
